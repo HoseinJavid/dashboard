@@ -1,30 +1,30 @@
 part of 'login_bloc.dart';
 
-enum LoginStatus { initial, loading, success, failure, invalid, valid }
-
 class LoginState extends Equatable {
-  final String phone;
-  final LoginStatus status;
+  @override
+  List<Object?> get props => [];
+}
+
+class LoginLoading extends LoginState {}
+
+class LoginInitial extends LoginState {}
+
+class LoginSuccess extends LoginState {
+  final String phoneNumber;
+
+  LoginSuccess({required this.phoneNumber});
+}
+
+class LoginError extends LoginState {
+  final String errorMessage;
+
+  LoginError({required this.errorMessage});
+}
+
+class LoginFildInvalid extends LoginState {
   final String? errorMessage;
 
-  const LoginState({
-    this.phone = '',
-    this.status = LoginStatus.initial,
-    this.errorMessage,
-  });
-
-  @override
-  List<Object?> get props => [phone, status, errorMessage];
-
-  LoginState copyWith({
-    String? phone,
-    LoginStatus? status,
-    String? errorMessage,
-  }) {
-    return LoginState(
-      phone: phone ?? this.phone,
-      status: status ?? this.status,
-      errorMessage: errorMessage ?? this.errorMessage,
-    );
-  }
+  LoginFildInvalid({required this.errorMessage});
 }
+
+class LoginFildValid extends LoginState {}

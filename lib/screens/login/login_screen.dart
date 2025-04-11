@@ -68,40 +68,36 @@ class _PhoneInputState extends State<_PhoneInput> {
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, LoginState>(
       builder: (context, state) {
-        final hasError = state.status == LoginStatus.invalid;
-        final isValid = state.status == LoginStatus.valid;
-
         return MouseRegion(
           onEnter: (_) => setState(() => _isHovered = true),
           onExit: (_) => setState(() => _isHovered = false),
           child: SizedBox(
             width: widthField.toDouble(),
-            height:
-                hasError ? heightField.toDouble() + 20 : heightField.toDouble(),
+            height: state is LoginFildInvalid
+                ? heightField.toDouble() + 20
+                : heightField.toDouble(),
             child: TextField(
+              textDirection: TextDirection.ltr,
               keyboardType: TextInputType.phone,
               decoration: InputDecoration(
                 labelText: 'شماره موبایل',
-                errorText: hasError ? state.errorMessage : null,
+                errorText:
+                    state is LoginFildInvalid ? state.errorMessage : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide(
-                    color: isValid
-                        ? themeData!.colorScheme.secondary
-                        : hasError
-                            ? Colors.red
-                            : Colors.grey,
+                    color: state is LoginFildInvalid
+                        ? Colors.red
+                        : themeData!.colorScheme.secondary,
                     width: 1,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide(
-                    color: isValid
-                        ? themeData!.colorScheme.secondary
-                        : hasError
-                            ? Colors.red
-                            : Colors.grey,
+                    color: state is LoginFildInvalid
+                        ? Colors.red
+                        : themeData!.colorScheme.secondary,
                     width: _isHovered ? 2 : 1,
                   ),
                 ),
@@ -115,7 +111,9 @@ class _PhoneInputState extends State<_PhoneInput> {
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide(
-                    color: isValid ? themeData!.primaryColor : Colors.red,
+                    color: state is LoginFildInvalid
+                        ? Colors.red
+                        : themeData!.colorScheme.primary,
                     width: 2,
                   ),
                 ),
@@ -143,6 +141,7 @@ class _PasswordInput extends StatelessWidget {
       width: widthField.toDouble(),
       height: heightField.toDouble(),
       child: const TextField(
+        textDirection: TextDirection.ltr,
         obscureText: true,
         decoration: InputDecoration(labelText: 'رمز عبور'),
       ),
@@ -157,25 +156,30 @@ class _LoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<LoginBloc, LoginState>(
       listener: (context, state) {
-        if (state.status == LoginStatus.success) {
-          context.go('/dashboard?phone=${state.phone}');
+        if (state is LoginSuccess) {
+          context.go('/dashboard?phone=${state.phoneNumber}');
         }
       },
       builder: (context, state) {
-        final isValid = PhoneValidator.isValid(state.phone);
         return SizedBox(
           width: 335,
           height: 50,
           child: ElevatedButton(
-            onPressed: state.status == LoginStatus.loading || !isValid
-                ? null
-                : () => context.read<LoginBloc>().add(LoginSubmitted()),
+            onPressed: () {
+              if (state is LoginInitial || state is LoginFildInvalid) {
+                return;
+              } else {
+                return context.read<LoginBloc>().add(LoginSubmitted());
+              }
+            },
             style: ElevatedButton.styleFrom(
-              disabledBackgroundColor:
-                  state.status == LoginStatus.invalid ? Colors.grey : null,
+              backgroundColor:
+                  state is LoginFildInvalid || state is LoginInitial
+                      ? Colors.grey
+                      : themeData!.colorScheme.primary,
             ),
-            child: state.status == LoginStatus.loading
-                ? const CircularProgressIndicator()
+            child: state is LoginLoading || state is LoginSuccess
+                ? const CircularProgressIndicator(color: Colors.white,)
                 : const Text('ورود'),
           ),
         );

@@ -1,7 +1,7 @@
 class PhoneValidator {
   static const _validPrefixes = ['+989', '989', '09'];
 
-  static String? validateAndFormat(String phone) {
+  static String? format(String phone) {
     final normalized = _normalizeNumber(phone);
     if (!_isValid(normalized)) return null;
     return normalized;

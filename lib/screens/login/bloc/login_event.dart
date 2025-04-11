@@ -12,4 +12,10 @@ class PhoneChanged extends LoginEvent {
   const PhoneChanged(this.phone);
 }
 
+class PasswordChanged extends LoginEvent {
+  final String password;
+
+  const PasswordChanged({required this.password});
+}
+
 class LoginSubmitted extends LoginEvent {}
