@@ -157,7 +157,7 @@ class _LoginButton extends StatelessWidget {
     return BlocConsumer<LoginBloc, LoginState>(
       listener: (context, state) {
         if (state is LoginSuccess) {
-          context.go('/dashboard?phone=${state.phoneNumber}');
+          context.go('/?phone=${state.phoneNumber}');
         }
       },
       builder: (context, state) {
@@ -178,9 +178,13 @@ class _LoginButton extends StatelessWidget {
                       ? Colors.grey
                       : themeData!.colorScheme.primary,
             ),
-            child: state is LoginLoading || state is LoginSuccess
-                ? const CircularProgressIndicator(color: Colors.white,)
-                : const Text('ورود'),
+            child: state is LoginLoading
+                ? const CircularProgressIndicator(
+                    color: Colors.white,
+                  )
+                : state is LoginSuccess
+                    ? const Icon(Icons.check)
+                    : const Text('ورود'),
           ),
         );
       },
