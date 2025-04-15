@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,6 +16,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool isHover = false;
   double _railWidth = 72;
   bool sideBarExtended = false;
+  bool isPined = false;
+  @override
+  void initState() {
+    isHover = true;
+    _railWidth = 150;
+    sideBarExtended = true;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,12 +35,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             MouseRegion(
               onEnter: (_) => setState(() {
-                isHover = true;
-                _railWidth = 150;
+                if (isPined) {
+                  isHover = true;
+                  _railWidth = 150;
+                }
               }),
               onExit: (_) => setState(() {
-                isHover = false;
-                _railWidth = 72;
+                if (isPined) {
+                  isHover = false;
+                  _railWidth = 72;
+                }
               }),
               child: AnimatedContainer(
                 onEnd: () {
@@ -45,7 +59,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   extended: _railWidth > 72,
                   backgroundColor: Colors.grey[200],
                   selectedIndex: _calculateSelectedIndex(context),
-                  onDestinationSelected: (index) => _onItemTapped(index, context),
+                  onDestinationSelected: (index) =>
+                      _onItemTapped(index, context),
                   destinations: [
                     NavigationRailDestination(
                       icon: const Icon(Icons.home),
@@ -87,6 +102,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             : null,
                       ),
                     ),
+                    NavigationRailDestination(
+                      icon: isPined
+                          ? const Icon(Icons.push_pin_outlined)
+                          : const Icon(Icons.push_pin),
+                      label: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 300),
+                        opacity: sideBarExtended ? 1.0 : 0.0,
+                        child: sideBarExtended && isHover
+                            ? const Text('پین کردن')
+                            : null,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -124,9 +151,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
         break;
       case 2:
         context.go('/settings');
-        break; 
+        break;
       case 3:
         context.go('/notifications');
+        break;
+      case 4:
+        setState(() {
+          isPined = !isPined;
+          setState(() {
+            if (!isPined) {
+              isHover = true;
+              _railWidth = 150;
+            } else {
+              isHover = false;
+              _railWidth = 72;
+            }
+          });
+        });
         break;
     }
   }

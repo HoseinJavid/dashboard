@@ -32,16 +32,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 // );
 
 bool isLoggedIn = false;
+//temporary Token storage simulation
+bool savedTokenAuth = false;
 final appRouter = GoRouter(
   redirect: (context, state) {
     isLoggedIn = context.read<LoginBloc>().state is LoginSuccess;
     final isGoingToLogin = state.uri.path == '/login';
 
-    if (!isLoggedIn && !isGoingToLogin) {
+    if (!savedTokenAuth && !isLoggedIn && !isGoingToLogin) {
+      savedTokenAuth = true;
       return '/login';
     }
 
-    if (isLoggedIn && isGoingToLogin) {
+    if (!savedTokenAuth && isLoggedIn && isGoingToLogin) {
       return '/';
     }
 
